@@ -1,6 +1,6 @@
 import TimeDisplay from '@/components/TimeDisplay';
 import { ThemeProvider } from '@/components/theme-provider';
-import { Clock, Globe } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { timeZones } from '@/lib/time-zones';
 
 function App() {
@@ -29,7 +29,7 @@ function App() {
           {/* Footer */}
           <footer className="mt-12 text-center text-sm text-muted-foreground">
             <div className="flex items-center justify-center space-x-2">
-              <Clock className="h-4 w-4" />
+{/*               <Clock className="h-4 w-4" /> */}
               <span>Real-time updates, you’ll have no excuse not to call me now 😏📲</span>
             </div>
           </footer>
