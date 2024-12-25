@@ -30,7 +30,7 @@ function App() {
           <footer className="mt-12 text-center text-sm text-muted-foreground">
             <div className="flex items-center justify-center space-x-2">
               <Clock className="h-4 w-4" />
-              <span>Real-time updates every second</span>
+              <span>Updates faster than me waiting for your call... C’mon, pick up! 😂📲</span>
             </div>
           </footer>
         </div>
