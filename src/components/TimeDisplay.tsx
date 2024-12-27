@@ -55,7 +55,7 @@ export default function TimeDisplay({ country, timezone, flag, location }: TimeZ
     day: 'numeric',
   }).format(time);
 
-  const [dateStr, timeStr] = formattedTime.split('at');
+  const [dateStr, timeStr] = formattedTime.split(' at ');
 
   return (
     <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-xl">
