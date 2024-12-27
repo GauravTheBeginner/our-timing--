@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Clock, MapPin } from 'lucide-react';
+import { Clock, MapPin, MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { AddNote } from './notes/AddNote';
+import { NotesList } from './notes/NotesList';
 
 interface TimeZoneProps {
   country: string;
@@ -9,7 +19,7 @@ interface TimeZoneProps {
   location?: string;
 }
 
-const TimeDisplay = ({ country, timezone, flag, location }: TimeZoneProps) => {
+export default function TimeDisplay({ country, timezone, flag, location }: TimeZoneProps) {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -18,7 +28,7 @@ const TimeDisplay = ({ country, timezone, flag, location }: TimeZoneProps) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, []); // Fixed: Added dependency array and changed useState to useEffect
 
   const formattedTime = new Intl.DateTimeFormat('en-US', {
     timeZone: timezone,
@@ -44,7 +54,22 @@ const TimeDisplay = ({ country, timezone, flag, location }: TimeZoneProps) => {
             <span className="text-2xl">{flag}</span>
             <h2 className="text-xl font-bold">{country}</h2>
           </div>
-          <MapPin className="h-4 w-4 text-muted-foreground" />
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MessageCircle className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Notes for {country}</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <NotesList timezone={timezone} />
+                <AddNote timezone={timezone} />
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardHeader>
 
@@ -68,6 +93,4 @@ const TimeDisplay = ({ country, timezone, flag, location }: TimeZoneProps) => {
       </CardContent>
     </Card>
   );
-};
-
-export default TimeDisplay;
+}

@@ -2,25 +2,32 @@ import TimeDisplay from '@/components/TimeDisplay';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Globe } from 'lucide-react';
 import { timeZones } from '@/lib/time-zones';
+import { AuthDialog } from '@/components/auth/AuthDialog';
+import { Notifications } from '@/components/Notifications';
 
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary  w-screen">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary w-screen">
         <div className="container mx-auto px-4 py-8 sm:py-12">
           {/* Header Section */}
-          <div className="mb-8 text-center">
-            <div className="inline-flex items-center justify-center space-x-3 rounded-full bg-primary/10 px-6 py-2 backdrop-blur-sm">
+          <div className="flex justify-between items-center mb-8">
+            {/* Globe Icon and Title */}
+            <div className="flex items-center space-x-2">
               <Globe className="h-6 w-6 animate-pulse text-primary" />
-              <h1 className="text-2xl font-bold sm:text-3xl">Our Timing</h1>
+              <h1 className="text-xl font-bold sm:text-3xl">Our Timing</h1>
             </div>
-            <p className="mt-4 text-muted-foreground">
-              Love knows no time zone, we’re always together ❤️
-            </p>
+
+            {/* Auth Dialog - Sign In or Sign Out */}
+            <AuthDialog />
           </div>
+          
+          <p className="text-center mb-8 text-muted-foreground">
+            Love Knows no time zone, we're always together ❤️
+          </p>
 
           {/* Time Displays Grid */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2">
             {timeZones.map((zone) => (
               <TimeDisplay key={zone.country} {...zone} />
             ))}
@@ -28,15 +35,12 @@ function App() {
 
           {/* Footer */}
           <footer className="mt-12 text-center text-sm text-muted-foreground">
-            <div className="flex items-center justify-center space-x-2">
-{/*               <Clock className="h-4 w-4" /> */}
-              <span>Real-time updates, you’ll have no excuse not to call me now 😏📲</span>
-            </div>
+            <p>Real-time updates, you’ll have no excuse not to call me now 😏📲</p>
           </footer>
         </div>
       </div>
+      <Notifications />
     </ThemeProvider>
   );
 }
-
-export default App;
+export default App
