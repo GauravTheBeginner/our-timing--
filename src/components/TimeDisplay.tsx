@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Clock, MapPin, MessageCircle } from 'lucide-react';
+import { Clock, MapPin, NotebookPen} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,6 +12,14 @@ import {
 import { AddNote } from './notes/AddNote';
 import { NotesList } from './notes/NotesList';
 
+export interface Note {
+  id: string;
+  content: string;
+  created_at: string;
+  user_id: string;
+  user_email: string;
+}
+
 interface TimeZoneProps {
   country: string;
   timezone: string;
@@ -21,6 +29,7 @@ interface TimeZoneProps {
 
 export default function TimeDisplay({ country, timezone, flag, location }: TimeZoneProps) {
   const [time, setTime] = useState(new Date());
+  const [newNote, setNewNote] = useState<Note | undefined>(undefined); // Track the new note to add instantly
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -28,7 +37,11 @@ export default function TimeDisplay({ country, timezone, flag, location }: TimeZ
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []); // Fixed: Added dependency array and changed useState to useEffect
+  }, []);
+
+  const handleNoteAdded = (note: Note) => {
+    setNewNote(note); // Update state with new note
+  };
 
   const formattedTime = new Intl.DateTimeFormat('en-US', {
     timeZone: timezone,
@@ -56,17 +69,17 @@ export default function TimeDisplay({ country, timezone, flag, location }: TimeZ
           </div>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MessageCircle className="h-4 w-4" />
+              <Button variant="ghost" className="p-2 ">
+                <NotebookPen height={20} width={20} color="white" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader className='mb-2'>
                 <DialogTitle>Notes for {country}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <NotesList timezone={timezone} />
-                <AddNote timezone={timezone} />
+                <NotesList timezone={timezone} newNote={newNote} />
+                <AddNote timezone={timezone} onNoteAdded={handleNoteAdded} />
               </div>
             </DialogContent>
           </Dialog>
@@ -94,3 +107,4 @@ export default function TimeDisplay({ country, timezone, flag, location }: TimeZ
     </Card>
   );
 }
+

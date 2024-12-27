@@ -4,7 +4,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/lib/supabase';
 
-
 interface Note {
   id: string;
   content: string;
@@ -15,9 +14,10 @@ interface Note {
 
 interface NotesListProps {
   timezone: string;
+  newNote?: Note; // Newly added note (to immediately display without re-fetching)
 }
 
-export function NotesList({ timezone }: NotesListProps) {
+export function NotesList({ timezone, newNote }: NotesListProps) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,12 +45,13 @@ export function NotesList({ timezone }: NotesListProps) {
 
     fetchNotes();
 
+    // Subscribe to real-time changes for the notes
     const channel = supabase
       .channel('notes_channel')
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'notes', filter: `timezone=eq.${timezone}` },
         () => {
-          fetchNotes();
+          fetchNotes(); // Only re-fetch when a new change is detected
         }
       )
       .subscribe();
@@ -59,6 +60,13 @@ export function NotesList({ timezone }: NotesListProps) {
       channel.unsubscribe();
     };
   }, [timezone]);
+
+  useEffect(() => {
+    // If newNote is passed, append it to the notes
+    if (newNote) {
+      setNotes((prevNotes) => [newNote, ...prevNotes]);
+    }
+  }, [newNote]);  // Re-render when a new note is passed
 
   if (loading) {
     return (
@@ -79,7 +87,7 @@ export function NotesList({ timezone }: NotesListProps) {
   }
 
   return (
-    <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+    <ScrollArea className="h-[250px] w-full rounded-md border p-4">
       {notes.length === 0 ? (
         <p className="text-center text-muted-foreground">No notes yet. Be the first to add one!</p>
       ) : (
@@ -88,11 +96,13 @@ export function NotesList({ timezone }: NotesListProps) {
             <Card key={note.id} className="bg-secondary/30">
               <CardContent className="p-3">
                 <p className="text-sm whitespace-pre-wrap">{note.content}</p>
-                <div className='flex justify-between items-center'>
-                <time className="text-xs text-muted-foreground block mt-2">
-                  {new Date(note.created_at).toLocaleString()}
-                </time>
-                <p className='text-xs text-muted-foreground block mt-2'>{note.user_email?.split('@')[0]}</p>
+                <div className="flex justify-between items-center">
+                  <time className="text-xs text-muted-foreground block mt-2">
+                    {new Date(note.created_at).toLocaleString()}
+                  </time>
+                  <p className="text-xs text-muted-foreground block mt-2">
+                    {note.user_email?.split('@')[0]}
+                  </p>
                 </div>
               </CardContent>
             </Card>
