@@ -20,6 +20,7 @@ export function AuthDialog() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
+  console.log(user?.user_metadata?.name.charAt(0).toUpperCase());
   const { addNotification } = useNotifications();
   const navigate = useNavigate();
   const handleSignOut = async () => {
@@ -41,7 +42,7 @@ export function AuthDialog() {
         >
           <Avatar className="h-10 w-10">
             <AvatarFallback>
-              {user.user_metadata?.name.charAt(0).toUpperCase()}
+              {user?.user_metadata?.name.charAt(0).toUpperCase() ?? 'U'}
             </AvatarFallback>
           </Avatar>
         </Button>
