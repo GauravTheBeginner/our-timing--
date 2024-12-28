@@ -42,7 +42,7 @@ export function AuthDialog() {
         >
           <Avatar className="h-10 w-10">
             <AvatarFallback>
-              {username }
+              {username || "You"}
             </AvatarFallback>
           </Avatar>
         </Button>
