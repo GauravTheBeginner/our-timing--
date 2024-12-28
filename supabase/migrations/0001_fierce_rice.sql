@@ -14,9 +14,6 @@
     - Add policies for CRUD operations
 */
 
--- Add user_email column to the notes table
-ALTER TABLE notes ADD COLUMN user_email text;
-
 CREATE TABLE IF NOT EXISTS notes (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   content text NOT NULL,
@@ -47,16 +44,3 @@ CREATE POLICY "Users can update their own notes"
   FOR UPDATE
   TO authenticated
   USING (auth.uid() = user_id);
-
-
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM notes WHERE user_email IS NOT NULL
-  ) THEN
-    UPDATE notes
-    SET user_email = (
-      SELECT email FROM auth.users WHERE id = notes.user_id
-    );
-  END IF;
-END $$;

@@ -11,6 +11,7 @@ interface Note {
   created_at: string;
   user_id: string;
   user_email: string;
+  user_name: string;
 }
 interface AddNoteProps {
   timezone: string;
@@ -22,7 +23,7 @@ export function AddNote({ timezone, onNoteAdded }: AddNoteProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addNotification } = useNotifications();
   const { user } = useAuth();
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
@@ -38,6 +39,7 @@ export function AddNote({ timezone, onNoteAdded }: AddNoteProps) {
       timezone,
       user_id: user.id,
       user_email: user.email,
+      user_name: user.user_metadata.name
     }).select(); // Select the inserted data after insert operation
 
     setIsSubmitting(false);

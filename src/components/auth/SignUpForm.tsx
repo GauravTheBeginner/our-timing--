@@ -11,6 +11,7 @@ interface SignUpFormProps {
 }
 
 export function SignUpForm({ onSuccess, onToggleMode }: SignUpFormProps) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,7 +21,7 @@ export function SignUpForm({ onSuccess, onToggleMode }: SignUpFormProps) {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(email, password, name);
 
     if (error) {
       addNotification('error', error.message);
@@ -33,6 +34,17 @@ export function SignUpForm({ onSuccess, onToggleMode }: SignUpFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="name">Name</Label>
+        <Input
+          id="name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          placeholder="Enter your name"
+        />
+      </div>
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input

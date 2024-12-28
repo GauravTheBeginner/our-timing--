@@ -1,21 +1,23 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/lib/supabase';
 
 interface Note {
   id: string;
   content: string;
   created_at: string;
   user_id: string;
+  user_email: string;
 }
 
 interface NotesListProps {
   timezone: string;
+  notesUpdated: boolean;
 }
 
-export function NotesList({ timezone }: NotesListProps) {
+export function NotesList({ timezone, notesUpdated }: NotesListProps) {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,8 @@ export function NotesList({ timezone }: NotesListProps) {
 
     fetchNotes();
 
-    const subscription = supabase
+    // Subscribe to real-time changes for the notes
+    const channel = supabase
       .channel('notes_channel')
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'notes', filter: `timezone=eq.${timezone}` },
@@ -54,9 +57,9 @@ export function NotesList({ timezone }: NotesListProps) {
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      channel.unsubscribe();
     };
-  }, [timezone]);
+  }, [timezone, notesUpdated]); // Listen for notesUpdated changes
 
   if (loading) {
     return (
@@ -86,9 +89,14 @@ export function NotesList({ timezone }: NotesListProps) {
             <Card key={note.id} className="bg-secondary/30">
               <CardContent className="p-3">
                 <p className="text-sm whitespace-pre-wrap">{note.content}</p>
-                <time className="text-xs text-muted-foreground block mt-2">
-                  {new Date(note.created_at).toLocaleString()}
-                </time>
+                <div className="flex justify-between items-center">
+                  <time className="text-xs text-muted-foreground block mt-2">
+                    {new Date(note.created_at).toLocaleString()}
+                  </time>
+                  <p className="text-xs text-muted-foreground block mt-2">
+                    {note.user_email?.split('@')[0]}
+                  </p>
+                </div>
               </CardContent>
             </Card>
           ))}

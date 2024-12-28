@@ -10,11 +10,12 @@ interface Note {
   created_at: string;
   user_id: string;
   user_email: string;
+  user_name: string;
 }
 
 interface NotesListProps {
   timezone: string;
-  newNote?: Note; // Newly added note (to immediately display without re-fetching)
+  newNote?: Note; 
 }
 
 export function NotesList({ timezone, newNote }: NotesListProps) {
@@ -101,7 +102,7 @@ export function NotesList({ timezone, newNote }: NotesListProps) {
                     {new Date(note.created_at).toLocaleString()}
                   </time>
                   <p className="text-xs text-muted-foreground block mt-2">
-                    {note.user_email?.split('@')[0]}
+                    {note.user_name}
                   </p>
                 </div>
               </CardContent>
