@@ -42,7 +42,7 @@ export function AuthDialog() {
         >
           <Avatar className="h-10 w-10">
             <AvatarFallback>
-              {user?.user_metadata?.name.charAt[0].toUpperCase() ?? 'U'}
+              {user?.user_metadata?.name.charAt(0).toUpperCase() ?? 'U'}
             </AvatarFallback>
           </Avatar>
         </Button>
