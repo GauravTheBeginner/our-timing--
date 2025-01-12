@@ -61,12 +61,11 @@ export function AvatarUpload({ userId, currentUrl, name, onUploadComplete }: Ava
       
       <Button
         variant="secondary"
-        size="icon"
         className="absolute bottom-0 right-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
         onClick={() => fileInputRef.current?.click()}
         disabled={uploading}
       >
-        <Camera className="h-4 w-4" />
+        <Camera height={10} width={10} color="white" />
       </Button>
 
       <input
