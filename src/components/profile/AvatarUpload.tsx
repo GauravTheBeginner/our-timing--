@@ -14,6 +14,7 @@ interface AvatarUploadProps {
 
 export function AvatarUpload({ userId, currentUrl, name, onUploadComplete }: AvatarUploadProps) {
   const [uploading, setUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState(currentUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { addNotification } = useNotifications();
 
@@ -26,21 +27,35 @@ export function AvatarUpload({ userId, currentUrl, name, onUploadComplete }: Ava
       setUploading(true);
       const file = event.target.files[0];
       const url = await uploadAvatar(userId, file);
+      
+      // Update local state and notify parent
+      setImageUrl(url);
       onUploadComplete(url);
       addNotification('success', 'Avatar updated successfully');
     } catch (error) {
-      addNotification('error', 'Error uploading avatar');
+      console.error('Upload error:', error);
+      const message = error instanceof Error 
+        ? error.message 
+        : 'Error uploading avatar. Please try again.';
+      addNotification('error', message);
     } finally {
       setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   }
 
   return (
     <div className="relative group">
-      <Avatar className="h-24 w-24">
-        <AvatarImage src={currentUrl} alt={name} />
-        <AvatarFallback className="text-lg">
-          {name.charAt(0).toUpperCase()}
+      <Avatar className="h-24 w-24 border-2 border-primary/10">
+        <AvatarImage 
+          src={imageUrl} 
+          alt={name} 
+          className="object-cover"
+        />
+        <AvatarFallback className="text-lg bg-primary/5">
+          {name[0]?.toUpperCase()}
         </AvatarFallback>
       </Avatar>
       
@@ -61,6 +76,12 @@ export function AvatarUpload({ userId, currentUrl, name, onUploadComplete }: Ava
         accept="image/*"
         className="hidden"
       />
+
+      {uploading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/50 rounded-full">
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent" />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Skeleton } from '@/components/ui/skeleton';
+import { NoteCard } from './NoteCard';
 import { supabase } from '@/lib/supabase';
 
 interface Note {
@@ -15,7 +14,7 @@ interface Note {
 
 interface NotesListProps {
   timezone: string;
-  newNote?: Note; 
+  newNote?: Note;
 }
 
 export function NotesList({ timezone, newNote }: NotesListProps) {
@@ -46,13 +45,12 @@ export function NotesList({ timezone, newNote }: NotesListProps) {
 
     fetchNotes();
 
-    // Subscribe to real-time changes for the notes
     const channel = supabase
       .channel('notes_channel')
       .on('postgres_changes', 
         { event: '*', schema: 'public', table: 'notes', filter: `timezone=eq.${timezone}` },
         () => {
-          fetchNotes(); // Only re-fetch when a new change is detected
+          fetchNotes();
         }
       )
       .subscribe();
@@ -63,17 +61,61 @@ export function NotesList({ timezone, newNote }: NotesListProps) {
   }, [timezone]);
 
   useEffect(() => {
-    // If newNote is passed, append it to the notes
     if (newNote) {
       setNotes((prevNotes) => [newNote, ...prevNotes]);
     }
-  }, [newNote]);  // Re-render when a new note is passed
+  }, [newNote]);
+
+  const handleDelete = async (noteId: string) => {
+    try {
+      // Delete the note from the database
+      const { error } = await supabase
+        .from('notes')
+        .delete()
+        .eq('id', noteId);
+  
+      if (error) {
+        throw error; // If deletion fails, throw the error to be caught
+      }
+  
+      // Update the local state if the deletion is successful
+      setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+    } catch (err) {
+      console.error('Failed to delete note:', err);
+      setError('Failed to delete the note. Please try again.');
+    }
+  };
+
+  const handleUpdate = async (noteId: string, newContent: string) => {
+    try {
+      // Update the note in the database
+      const { error } = await supabase
+        .from('notes')
+        .update({ content: newContent })
+        .eq('id', noteId);
+  
+      if (error) {
+        throw error; // If update fails, throw the error to be caught
+      }
+  
+      // Update the local state if the update is successful
+      setNotes((prevNotes) =>
+        prevNotes.map((note) =>
+          note.id === noteId ? { ...note, content: newContent } : note
+        )
+      );
+    } catch (err) {
+      console.error('Failed to update note:', err);
+      setError('Failed to update the note. Please try again.');
+    }
+  };
+  
 
   if (loading) {
     return (
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-20 w-full" />
+          <div key={i} className="h-32 bg-secondary/20 animate-pulse rounded-lg" />
         ))}
       </div>
     );
@@ -88,25 +130,20 @@ export function NotesList({ timezone, newNote }: NotesListProps) {
   }
 
   return (
-    <ScrollArea className="h-[250px] w-full rounded-md border p-4">
+    <ScrollArea className="h-[400px] w-full rounded-md border p-4">
       {notes.length === 0 ? (
-        <p className="text-center text-muted-foreground">No notes yet. Be the first to add one!</p>
+        <p className="text-center text-muted-foreground">
+          No notes yet. Be the first to add one!
+        </p>
       ) : (
         <div className="space-y-4">
           {notes.map((note) => (
-            <Card key={note.id} className="bg-secondary/30">
-              <CardContent className="p-3">
-                <p className="text-sm whitespace-pre-wrap">{note.content}</p>
-                <div className="flex justify-between items-center">
-                  <time className="text-xs text-muted-foreground block mt-2">
-                    {new Date(note.created_at).toLocaleString()}
-                  </time>
-                  <p className="text-xs text-muted-foreground block mt-2">
-                    {note.user_name}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <NoteCard
+              key={note.id}
+              note={note}
+              onDelete={handleDelete}
+              onUpdate={handleUpdate}
+            />
           ))}
         </div>
       )}

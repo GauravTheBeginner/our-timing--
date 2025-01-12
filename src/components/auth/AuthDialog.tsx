@@ -14,7 +14,7 @@ import { SignUpForm } from './SignUpForm';
 import { useAuth } from '@/lib/auth-context';
 import { signOut } from '@/lib/auth';
 import { useNotifications } from '@/lib/notifications';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function AuthDialog() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -40,8 +40,9 @@ export function AuthDialog() {
           onClick={() => navigate('/profile')}
         >
           <Avatar className="h-10 w-10">
+            <AvatarImage src={user.user_metadata.avatar_url} />
             <AvatarFallback>
-            {user?.user_metadata?.name?.[0]?.toUpperCase() ?? 'U'}
+              {user.user_metadata.name?.[0]?.toUpperCase() ?? user.email?.[0]?.toUpperCase() ?? 'U'}
             </AvatarFallback>
           </Avatar>
         </Button>

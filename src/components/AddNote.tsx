@@ -1,57 +1,55 @@
 import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useNotifications } from '@/lib/notifications';
-import { useAuth } from '@/lib/auth-context';
-import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
+import { getCurrentUser } from '@/lib/auth';
 
-interface Note {
-  id: string;
-  content: string;
-  created_at: string;
-  user_id: string;
-  user_email: string;
-  user_name: string;
-}
 interface AddNoteProps {
   timezone: string;
-  onNoteAdded: (newNote: Note) => void; 
 }
 
-export function AddNote({ timezone, onNoteAdded }: AddNoteProps) {
+export function AddNote({ timezone }: AddNoteProps) {
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { addNotification } = useNotifications();
-  const { user } = useAuth();
-  
+  const { toast } = useToast();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
 
+    const { data: { user } } = await getCurrentUser();
+    
     if (!user) {
-      addNotification('error', 'Please sign in to add notes');
+      toast({
+        title: 'Error',
+        description: 'Please sign in to add notes',
+        variant: 'destructive',
+      });
       return;
     }
 
     setIsSubmitting(true);
-    const { data, error } = await supabase.from('notes').insert({
+    const { error } = await supabase.from('notes').insert({
       content: content.trim(),
       timezone,
-      user_id: user.id,
-      user_email: user.email,
-      user_name: user.user_metadata.name
-    }).select(); // Select the inserted data after insert operation
+      user_id: user.id
+    });
 
     setIsSubmitting(false);
 
     if (error) {
-      addNotification('error', 'Failed to add note. Please try again.');
+      toast({
+        title: 'Error',
+        description: 'Failed to add note. Please try again.',
+        variant: 'destructive',
+      });
     } else {
       setContent('');
-      addNotification('success', 'Note added successfully!');
-      if (data) {
-        onNoteAdded(data[0]);
-      }
+      toast({
+        title: 'Success',
+        description: 'Note added successfully!',
+      });
     }
   };
 

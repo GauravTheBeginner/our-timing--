@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useNotifications } from '@/lib/notifications';
 import { updateProfile, type Profile } from '@/lib/profile';
-import { supabase } from '@/lib/supabase';
 
 interface ProfileFormProps {
   profile: Profile;
@@ -12,7 +11,6 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ profile, onSave }: ProfileFormProps) {
-  
   const [name, setName] = useState(profile.name);
   const [saving, setSaving] = useState(false);
   const { addNotification } = useNotifications();
@@ -23,10 +21,6 @@ export function ProfileForm({ profile, onSave }: ProfileFormProps) {
 
     try {
       const { data, error } = await updateProfile(profile.id, { name });
-      const { error: authError } = await supabase.auth.updateUser({
-        data: { name },
-      });
-      if (authError) throw authError;
       
       if (error) throw error;
       if (data) {

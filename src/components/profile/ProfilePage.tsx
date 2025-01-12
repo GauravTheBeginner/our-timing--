@@ -16,7 +16,7 @@ export function ProfilePage() {
   const { user } = useAuth();
   const { addNotification } = useNotifications();
   const navigate = useNavigate();
-
+  console.log(user)
   useEffect(() => {
     async function loadProfile() {
       if (!user) {
@@ -38,6 +38,11 @@ export function ProfilePage() {
     loadProfile();
   }, [user, navigate, addNotification]);
 
+  if (!user) {
+    navigate('/');
+    return null;
+  }
+
   if (loading) {
     return <ProfileSkeleton />;
   }
@@ -45,7 +50,7 @@ export function ProfilePage() {
   if (!profile) {
     return null;
   }
-
+  console.log("profiee",profile)
   return (
     <div className="container max-w-2xl mx-auto px-4 py-8">
       <Button
