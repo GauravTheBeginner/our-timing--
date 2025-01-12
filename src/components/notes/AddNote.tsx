@@ -33,6 +33,7 @@ export function AddNote({ timezone, onNoteAdded }: AddNoteProps) {
       return;
     }
 
+
     setIsSubmitting(true);
     const { data, error } = await supabase.from('notes').insert({
       content: content.trim(),
@@ -40,8 +41,7 @@ export function AddNote({ timezone, onNoteAdded }: AddNoteProps) {
       user_id: user.id,
       user_email: user.email,
       user_name: user.user_metadata.name
-    }).select(); // Select the inserted data after insert operation
-
+    }).select();
     setIsSubmitting(false);
 
     if (error) {
