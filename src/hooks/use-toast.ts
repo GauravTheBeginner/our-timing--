@@ -1,4 +1,4 @@
-// Move the existing use-toast.ts content from src/hooks/use-toast.ts to here
+
 import * as React from 'react';
 import type { ToastActionElement, ToastProps } from '@/components/ui/toast';
 
@@ -11,7 +11,7 @@ type ToasterToast = ToastProps & {
   description?: React.ReactNode;
   action?: ToastActionElement;
 };
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const actionTypes = {
   ADD_TOAST: 'ADD_TOAST',
   UPDATE_TOAST: 'UPDATE_TOAST',
@@ -150,7 +150,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       open: true,
-      onOpenChange: (open) => {
+      onOpenChange: (open: boolean) => {
         if (!open) dismiss();
       },
     },
