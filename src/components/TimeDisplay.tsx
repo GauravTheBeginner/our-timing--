@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Clock, MapPin, NotebookPen} from 'lucide-react';
+import { Clock, MapPin, NotebookPen, Thermometer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -30,8 +30,9 @@ interface TimeZoneProps {
 
 export default function TimeDisplay({ country, timezone, flag, location }: TimeZoneProps) {
   const [time, setTime] = useState(new Date());
-  const [newNote, setNewNote] = useState<Note | undefined>(undefined); // Track the new note to add instantly
-
+  const [temperature, setTemperature] = useState<string | null>(null);
+  const [newNote, setNewNote] = useState<Note | undefined>(undefined);
+  const apiKey = import.meta.env.VITE_WEATHER_API_KEY
   useEffect(() => {
     const timer = setInterval(() => {
       setTime(new Date());
@@ -40,8 +41,29 @@ export default function TimeDisplay({ country, timezone, flag, location }: TimeZ
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    const fetchTemperature = async () => {
+      try {
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${apiKey}`
+        );
+        const data = await response.json();
+        if (data && data.main) {
+          setTemperature(`${data.main.temp}°C`);
+        } else {
+          setTemperature('N/A');
+        }
+      } catch (error) {
+        console.log(error);
+        setTemperature('Error');
+      }
+    };
+
+    fetchTemperature();
+  }, [location]);
+
   const handleNoteAdded = (note: Note) => {
-    setNewNote(note); // Update state with new note
+    setNewNote(note);
   };
 
   const formattedTime = new Intl.DateTimeFormat('en-US', {
@@ -61,7 +83,7 @@ export default function TimeDisplay({ country, timezone, flag, location }: TimeZ
   return (
     <Card className="group relative overflow-hidden transition-all duration-300 hover:shadow-xl">
       <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      
+
       <CardHeader className="relative space-y-0 pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -70,12 +92,12 @@ export default function TimeDisplay({ country, timezone, flag, location }: TimeZ
           </div>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="ghost" className="p-2 ">
+              <Button variant="ghost" className="p-2">
                 <NotebookPen height={20} width={20} color="white" />
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader className='mb-2'>
+              <DialogHeader className="mb-2">
                 <DialogTitle>Notes for {country}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
@@ -93,6 +115,10 @@ export default function TimeDisplay({ country, timezone, flag, location }: TimeZ
             <Clock className="h-5 w-5 text-primary animate-pulse" />
             <span className="text-3xl font-bold tracking-tight">{timeStr}</span>
           </div>
+          <div className="flex items-center mt-3 space-x-2 text-muted-foreground">
+            <Thermometer className="h-4 w-4" />
+            <span>{temperature || 'Loading...'}</span>
+          </div>
         </div>
 
         <div className="space-y-1">
@@ -108,4 +134,3 @@ export default function TimeDisplay({ country, timezone, flag, location }: TimeZ
     </Card>
   );
 }
-
