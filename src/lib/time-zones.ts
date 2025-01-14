@@ -12,7 +12,7 @@ export const timeZones = [
     location: 'Dhaka',
   },
   {
-    country: 'United States of America',
+    country: 'USA',
     timezone: 'America/New_York',
     flag: '🇺🇸',
     location: 'Ohio',

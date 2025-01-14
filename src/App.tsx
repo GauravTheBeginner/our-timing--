@@ -18,7 +18,7 @@ function App() {
               <main className="container mx-auto px-4 py-8">
                 <div className="max-w-4xl mx-auto">
                   <p className="text-center mb-8 text-muted-foreground">
-                    Love Knows no time zone, we're always together ❤️
+                  TIME ZONES? DON’T CAP – GET IN THE GAME AND DROP A NOTE NOW 💥
                   </p>
 
                   <div className="grid gap-6 sm:grid-cols-2">
@@ -28,7 +28,7 @@ function App() {
                   </div>
 
                   <footer className="mt-12 text-center text-sm text-muted-foreground">
-                    <p>Real-time updates, you'll have no excuse not to call me now 😏📲</p>
+                    <p>Quit frontin’ – you’ve got the time, now drop that note 🕒🔥</p>
                   </footer>
                 </div>
               </main>
