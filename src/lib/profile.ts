@@ -17,7 +17,13 @@ export async function updateProfile(userId: string, updates: Partial<Profile>) {
       .eq('id', userId)
       .select()
       .single();
-
+    if (updates.name) {
+      const { error: notesError } = await supabase
+        .from('notes')
+        .update({ user_name: updates.name }) 
+        .eq('user_id', userId);
+      if (notesError) throw notesError;
+    }
     if (error) throw error;
     return { data, error: null };
   } catch (error) {
@@ -56,7 +62,7 @@ export async function getProfile(userId: string) {
         .single();
 
       if (createError) throw createError;
-      
+
       // Get notes count for new profile
       const { count: notesCount } = await supabase
         .from('notes')
