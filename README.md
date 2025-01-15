@@ -63,7 +63,3 @@ VITE_WEATHER_API_KEY=your-openweathermap-api-key
 
 - Add more countries and dynamic data fetching.
 - Implement features like note categories or the ability to share notes.
-
----
-
-This should give a good overview of how contributors can get involved, along with the required setup for the environment variables. Let me know if you need any further changes!
